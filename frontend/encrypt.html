@@ -368,8 +368,9 @@
                         encryptedRawBytes = xorTransform(content, key);
                         encryptedData = bytesToBase64(encryptedRawBytes);
                     } else {
-                        const sourceText = new TextDecoder().decode(content);
-                        const encryptedText = encryptText(sourceText, selectedAlgorithm, key);
+                        const uint8Array = new Uint8Array(content);
+                        const base64Data = bytesToBase64(uint8Array);
+                        const encryptedText = encryptText(base64Data, selectedAlgorithm, key);
                         encryptedRawBytes = new TextEncoder().encode(encryptedText);
                         encryptedData = encryptedText;
                     }
@@ -379,6 +380,8 @@
                         document.getElementById('progressText').textContent = 'Complete!';
                         document.getElementById('encryptedOutput').textContent = encryptedData.substring(0, 500) + (encryptedData.length > 500 ? '...' : '');
                         document.getElementById('successMessage').classList.add('active');
+                        
+                        trackEncryptedFile(selectedFile.name, selectedAlgorithm, Date.now());
                     }
                 };
                 reader.readAsArrayBuffer(selectedFile);

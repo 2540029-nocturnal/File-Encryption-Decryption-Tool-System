@@ -131,6 +131,8 @@
                         } else {
                             document.getElementById('decryptedOutput').textContent = decoded.substring(0, 500) + (decoded.length > 500 ? '...' : '');
                         }
+                        
+                        trackDecryptedFile(file.name);
                     }
                 };
                 reader.readAsArrayBuffer(file);

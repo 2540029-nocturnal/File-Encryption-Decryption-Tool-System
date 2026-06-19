@@ -149,48 +149,49 @@
     <script>
         if (!isAuthenticated()) window.location.href = 'login.html';
 
-        const sampleHistory = [
-            { date: new Date().toISOString(), algorithm: 'caesar', operation: 'encrypt', status: 'success', size: '2.5 MB' },
-            { date: new Date(Date.now() - 86400000).toISOString(), algorithm: 'xor', operation: 'decrypt', status: 'success', size: '1.2 MB' },
-            { date: new Date(Date.now() - 172800000).toISOString(), algorithm: 'caesar', operation: 'encrypt', status: 'success', size: '3.8 MB' },
-        ];
-
         function loadReports() {
-            const history = sampleHistory;
+            const files = getAllUserFiles();
             
-            
-            const encryptions = history.filter(h => h.operation === 'encrypt').length;
-            const decryptions = history.filter(h => h.operation === 'decrypt').length;
-            const successful = history.filter(h => h.status === 'success').length;
+            // Calculate statistics
+            const encryptions = files.filter(f => f.type === 'encrypted').length;
+            const decryptions = files.filter(f => f.type === 'decrypted').length;
+            const total = files.length;
+            const successful = files.length; // All tracked files are successful
 
             document.getElementById('totalEncryptions').textContent = encryptions;
             document.getElementById('totalDecryptions').textContent = decryptions;
-            document.getElementById('successRate').textContent = ((successful / history.length) * 100).toFixed(0) + '%';
-            document.getElementById('filesProcessed').textContent = history.length;
+            document.getElementById('successRate').textContent = total > 0 ? '100%' : '0%';
+            document.getElementById('filesProcessed').textContent = total;
 
-            
-            const caesarCount = history.filter(h => h.algorithm === 'caesar').length;
-            const xorCount = history.filter(h => h.algorithm === 'xor').length;
+            // Algorithm usage
+            const caesarCount = files.filter(f => f.algorithm === 'caesar').length;
+            const xorCount = files.filter(f => f.algorithm === 'xor').length;
             document.getElementById('caesarCount').textContent = caesarCount;
             document.getElementById('xorCount').textContent = xorCount;
 
-            
-            let html = '<table><thead><tr><th>Date & Time</th><th>Algorithm</th><th>Operation</th><th>File Size</th><th>Status</th></tr></thead><tbody>';
-            
-            history.forEach(item => {
-                const statusColor = item.status === 'success' ? 'var(--success)' : 'var(--danger)';
-                html += `
-                    <tr>
-                        <td>${formatDate(item.date)}</td>
-                        <td>${item.algorithm === 'caesar' ? '🔄 Caesar Cipher' : '⚙️ XOR Cipher'}</td>
-                        <td>${item.operation === 'encrypt' ? '🔒 Encryption' : '🔓 Decryption'}</td>
-                        <td>${item.size}</td>
-                        <td><span style="color: ${statusColor}; font-weight: 600;">● ${item.status.toUpperCase()}</span></td>
-                    </tr>
-                `;
-            });
+            // Build history table
+            let html = '';
+            if (files.length === 0) {
+                html = '<p style="color: #a8a8a8; text-align: center;">No encryption history yet. Start encrypting files!</p>';
+            } else {
+                html = '<table><thead><tr><th>Date & Time</th><th>Filename</th><th>Algorithm</th><th>Operation</th><th>Status</th></tr></thead><tbody>';
+                
+                files.forEach(item => {
+                    const algoDisplay = item.algorithm === 'caesar' ? '🔄 Caesar Cipher' : item.algorithm === 'xor' ? '⚙️ XOR Cipher' : '-';
+                    const operationDisplay = item.type === 'encrypted' ? '🔒 Encryption' : '🔓 Decryption';
+                    html += `
+                        <tr>
+                            <td>${formatDate(item.timestamp)}</td>
+                            <td>${item.filename || '-'}</td>
+                            <td>${algoDisplay}</td>
+                            <td>${operationDisplay}</td>
+                            <td><span style="color: var(--success); font-weight: 600;">● SUCCESS</span></td>
+                        </tr>
+                    `;
+                });
 
-            html += '</tbody></table>';
+                html += '</tbody></table>';
+            }
             document.getElementById('historyTable').innerHTML = html;
         }
 
@@ -211,7 +212,21 @@
         }
 
         function exportReportCSV() {
-            exportToCSV(sampleHistory, 'encryption_report.csv');
+            const files = getAllUserFiles();
+            if (files.length === 0) {
+                showAlert('No data to export', 'error');
+                return;
+            }
+            
+            const csvData = files.map(f => ({
+                date: formatDate(f.timestamp),
+                filename: f.filename || '-',
+                algorithm: f.algorithm || '-',
+                operation: f.type === 'encrypted' ? 'Encryption' : 'Decryption',
+                status: 'Success'
+            }));
+            
+            exportToCSV(csvData, 'encryption_report.csv');
         }
 
         loadReports();

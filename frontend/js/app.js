@@ -2,6 +2,7 @@
 const STORAGE_USERS = 'cypherlock_users';
 const STORAGE_CURRENT = 'cypherlock_current';
 const STORAGE_KEYS = 'cypherlock_keys';
+const STORAGE_FILES = 'cypherlock_files';
 
 function showAlert(message, type = 'info') {
     const container = document.getElementById('alertContainer') || document.body;
@@ -95,7 +96,6 @@ function createAccount(username, email, password, confirm) {
         showAlert('Email already registered.', 'error');
         return false;
     }
-
     const user = {
         id: Date.now(),
         username,
@@ -109,10 +109,6 @@ function createAccount(username, email, password, confirm) {
     setCurrentUser(user);
     showAlert('Account created successfully!', 'success');
     return true;
-}
-
-function login(email, password) {
-    return loginAccount(email, password);
 }
 
 function register(username, email, password, confirm) {
@@ -135,6 +131,10 @@ function loginAccount(email, password) {
     setCurrentUser(user);
     showAlert('Login successful!', 'success');
     return true;
+}
+
+function login(email, password) {
+    return loginAccount(email, password);
 }
 
 function getAllKeys() {
@@ -317,14 +317,16 @@ function decryptBytes(data, algorithm, key) {
         showAlert('Encrypted data, algorithm, and key are required.', 'error');
         return null;
     }
-
     if (algorithm === 'caesar') {
         const text = typeof data === 'string' ? data : new TextDecoder().decode(data);
         const shift = parseInt(key, 10);
         const decrypted = caesarDecrypt(text, Number.isNaN(shift) ? 3 : shift);
-        return new TextEncoder().encode(decrypted);
+        try {
+            return base64ToBytes(decrypted);
+        } catch (e) {
+            return new TextEncoder().encode(decrypted);
+        }
     }
-
     return xorRestore(data, key);
 }
 
@@ -377,12 +379,65 @@ function addKey(algorithm, description) {
     return key;
 }
 
+function trackEncryptedFile(filename, algorithm, keyId) {
+    const user = getCurrentUser();
+    if (!user) return false;
+    
+    const storage = 'cypherlock_files';
+    const files = JSON.parse(localStorage.getItem(storage) || '[]');
+    
+    files.push({
+        id: Date.now(),
+        user_id: user.id,
+        filename: filename,
+        algorithm: algorithm,
+        key_id: keyId,
+        type: 'encrypted',
+        timestamp: new Date().toISOString(),
+    });
+    
+    localStorage.setItem(storage, JSON.stringify(files));
+    return true;
+}
+
+function trackDecryptedFile(filename) {
+    const user = getCurrentUser();
+    if (!user) return false;
+    
+    const storage = 'cypherlock_files';
+    const files = JSON.parse(localStorage.getItem(storage) || '[]');
+    
+    files.push({
+        id: Date.now(),
+        user_id: user.id,
+        filename: filename,
+        type: 'decrypted',
+        timestamp: new Date().toISOString(),
+    });
+    
+    localStorage.setItem(storage, JSON.stringify(files));
+    return true;
+}
+
+function getUserFiles() {
+    const user = getCurrentUser();
+    if (!user) return [];
+    
+    const storage = 'cypherlock_files';
+    const files = JSON.parse(localStorage.getItem(storage) || '[]');
+    return files.filter(f => f.user_id === user.id);
+}
+
 function getDashboardStats() {
     const keys = getAllKeys();
+    const files = getUserFiles();
+    const encryptedFiles = files.filter(f => f.type === 'encrypted').length;
+    const decryptedFiles = files.filter(f => f.type === 'decrypted').length;
+    
     return {
-        totalFiles: 0,
-        encryptedFiles: 0,
-        decryptedFiles: 0,
+        totalFiles: files.length,
+        encryptedFiles: encryptedFiles,
+        decryptedFiles: decryptedFiles,
         activeKeys: keys.length,
         keys,
     };
@@ -397,6 +452,5 @@ function initializePage() {
 }
 
 document.addEventListener('DOMContentLoaded', initializePage);
-
 window.currentUser = getCurrentUser();
 

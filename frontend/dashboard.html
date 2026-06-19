@@ -321,7 +321,6 @@
         }
 
         function updateTime() {
-        function updateTime() {
             const now = new Date();
             document.getElementById('currentTime').textContent = now.toLocaleTimeString();
         }
@@ -330,19 +329,18 @@
 
         async function loadDashboard() {
             try {
-                const keys = await getAllKeys();
-                document.getElementById('activeKeys').textContent = keys.length || 0;
-
-                
-                document.getElementById('totalFiles').textContent = Math.floor(Math.random() * 50) + 1;
-                document.getElementById('encryptedFiles').textContent = Math.floor(Math.random() * 30);
-                document.getElementById('decryptedFiles').textContent = Math.floor(Math.random() * 20);
+                const stats = getDashboardStats();
+                document.getElementById('activeKeys').textContent = stats.activeKeys || 0;
+                document.getElementById('totalFiles').textContent = stats.totalFiles || 0;
+                document.getElementById('encryptedFiles').textContent = stats.encryptedFiles || 0;
+                document.getElementById('decryptedFiles').textContent = stats.decryptedFiles || 0;
             } catch (error) {
                 console.error('Dashboard load error:', error);
             }
         }
 
         loadDashboard();
+        setInterval(loadDashboard, 5000);
     </script>
 </body>
 </html>
