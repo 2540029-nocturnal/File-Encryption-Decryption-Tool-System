@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypt - CipherTool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .encryption-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .encryption-section {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.6) 0%, rgba(10, 14, 39, 0.6) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .section-title {
+            color: #00ffff;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .drag-drop-area {
+            border: 3px dashed rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 212, 255, 0.02);
+        }
+
+        .drag-drop-area:hover,
+        .drag-drop-area.dragover {
+            border-color: #00ffff;
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .drag-drop-icon {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .drag-drop-text {
+            color: #a8a8a8;
+            line-height: 1.6;
+        }
+
+        .drag-drop-text strong {
+            color: #00ffff;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-preview {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .file-preview.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-name {
+            color: #00ffff;
+            font-weight: 600;
+        }
+
+        .file-size {
+            color: #a8a8a8;
+            font-size: 0.9rem;
+        }
+
+        .progress-section {
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .algorithm-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .algorithm-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(0, 212, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: #a8a8a8;
+        }
+
+        .algorithm-option:hover {
+            border-color: #00ffff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .algorithm-option.active {
+            border-color: #00ffff;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 255, 255, 0.1) 100%);
+            color: #00ffff;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid var(--success);
+            border-radius: 5px;
+            padding: 1.5rem;
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .success-message.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .output-area {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 5px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #00d4ff;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .encryption-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="goHome()" title="Go to Dashboard">
+                <i class="fas fa-lock logo-icon"></i>
+                <span>CipherTool</span>
+            </div>
+            <nav>
+                <button onclick="navigateTo('dashboard')" class="btn btn-secondary">Dashboard</button>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 style="color: #00ffff; margin-bottom: 2rem; font-size: 2rem;">
+                <i class="fas fa-lock"></i> Encrypt Files
+            </h1>
+
+            <div class="encryption-container">
+                
+                <div class="encryption-section">
+                    <h2 class="section-title"><i class="fas fa-file-upload"></i> Upload File</h2>
+
+                    <div class="drag-drop-area" id="dragDropArea">
+                        <i class="fas fa-cloud-upload-alt drag-drop-icon"></i>
+                        <div class="drag-drop-text">
+                            Drag and drop your file here<br>
+                            <strong>or click to browse</strong>
+                        </div>
+                    </div>
+
+                    <input type="file" id="fileInput" class="file-input">
+
+                    <div class="file-preview" id="filePreview">
+                        <div class="file-info">
+                            <span class="file-name" id="fileName"></span>
+                            <span class="file-size" id="fileSize"></span>
+                        </div>
+                        <button type="button" onclick="clearFile()" class="btn btn-secondary" style="width: 100%;">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+
+                    <h2 class="section-title" style="margin-top: 2rem;"><i class="fas fa-cog"></i> Encryption Settings</h2>
+
+                    <div class="form-group">
+                        <label>Select Algorithm</label>
+                        <div class="algorithm-selector">
+                            <div class="algorithm-option active" data-algo="caesar">
+                                <i class="fas fa-sync-alt"></i><br>
+                                Caesar Cipher
+                            </div>
+                            <div class="algorithm-option" data-algo="xor">
+                                <i class="fas fa-code"></i><br>
+                                XOR Cipher
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="encryptionKey">Encryption Key</label>
+                        <input type="text" id="encryptionKey" placeholder="Enter or paste your encryption key">
+                    </div>
+
+                    <button onclick="encryptFile()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        <i class="fas fa-lock"></i> Encrypt File
+                    </button>
+                </div>
+
+                
+                <div class="encryption-section">
+                    <h2 class="section-title"><i class="fas fa-file-download"></i> Encrypted Output</h2>
+
+                    <div id="progressSection" class="progress-section">
+                        <label>Encryption Progress</label>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressText" style="color: #a8a8a8; font-size: 0.9rem;">Initializing...</p>
+                    </div>
+
+                    <div id="successMessage" class="success-message">
+                        <h3 style="color: var(--success); margin-bottom: 1rem;">
+                            <i class="fas fa-check-circle"></i> Encryption Successful!
+                        </h3>
+                        <p style="color: #a8a8a8; margin-bottom: 1rem;">Your file has been encrypted successfully.</p>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label>Encrypted Content</label>
+                        <div class="output-area" id="encryptedOutput">
+                            Encrypted content will appear here...
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button onclick="copyEncrypted()" class="btn btn-secondary" style="width: 100%;">
+                            <i class="fas fa-copy"></i> Copy Encrypted Text
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <button onclick="downloadEncrypted()" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-download"></i> Download Encrypted File
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="alertContainer"></div>
+    <script src="js/app.js"></script>
+    <script>
+        if (!isAuthenticated()) window.location.href = 'login.html';
+
+        let selectedFile = null;
+        let selectedAlgorithm = 'caesar';
+        let encryptedData = '';
+        let encryptedRawBytes = null;
+
+        const dragDropArea = document.getElementById('dragDropArea');
+        dragDropArea.addEventListener('click', () => document.getElementById('fileInput').click());
+
+        dragDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragDropArea.classList.add('dragover');
+        });
+
+        dragDropArea.addEventListener('dragleave', () => {
+            dragDropArea.classList.remove('dragover');
+        });
+
+        dragDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragDropArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) selectFile(files[0]);
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) selectFile(e.target.files[0]);
+        });
+
+        document.querySelectorAll('.algorithm-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.algorithm-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                selectedAlgorithm = this.dataset.algo;
+            });
+        });
+
+        function selectFile(file) {
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(2) + ' KB';
+            document.getElementById('filePreview').classList.add('active');
+        }
+
+        function clearFile() {
+            selectedFile = null;
+            document.getElementById('filePreview').classList.remove('active');
+            document.getElementById('fileInput').value = '';
+        }
+
+        async function encryptFile() {
+            if (!selectedFile) {
+                showAlert('Please select a file', 'error');
+                return;
+            }
+
+            const key = document.getElementById('encryptionKey').value;
+            if (!key) {
+                showAlert('Please enter an encryption key', 'error');
+                return;
+            }
+
+            document.getElementById('progressSection').classList.add('active');
+            document.getElementById('successMessage').classList.remove('active');
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const content = e.target.result;
+                    document.getElementById('progressFill').style.width = '30%';
+                    document.getElementById('progressText').textContent = 'Processing...';
+
+                    setTimeout(() => {
+                        document.getElementById('progressFill').style.width = '70%';
+                    }, 500);
+
+                    if (selectedAlgorithm === 'xor') {
+                        encryptedRawBytes = xorTransform(content, key);
+                        encryptedData = bytesToBase64(encryptedRawBytes);
+                    } else {
+                        const sourceText = new TextDecoder().decode(content);
+                        const encryptedText = encryptText(sourceText, selectedAlgorithm, key);
+                        encryptedRawBytes = new TextEncoder().encode(encryptedText);
+                        encryptedData = encryptedText;
+                    }
+
+                    if (encryptedData) {
+                        document.getElementById('progressFill').style.width = '100%';
+                        document.getElementById('progressText').textContent = 'Complete!';
+                        document.getElementById('encryptedOutput').textContent = encryptedData.substring(0, 500) + (encryptedData.length > 500 ? '...' : '');
+                        document.getElementById('successMessage').classList.add('active');
+                    }
+                };
+                reader.readAsArrayBuffer(selectedFile);
+            } catch (error) {
+                showAlert('Encryption error: ' + error.message, 'error');
+            }
+        }
+
+        function copyEncrypted() {
+            if (encryptedData) copyToClipboard(encryptedData);
+        }
+
+        function downloadEncrypted() {
+            if (!encryptedRawBytes || !selectedFile) {
+                showAlert('No encrypted data to download', 'error');
+                return;
+            }
+            const blob = new Blob([encryptedRawBytes], { type: 'application/octet-stream' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = selectedFile.name + '.encrypted';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showAlert('File downloaded successfully', 'success');
+        }
+    </script>
+</body>
+</html>

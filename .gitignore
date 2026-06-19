@@ -1,0 +1,104 @@
+# Dependency Lock Files
+node_modules/
+yarn.lock
+package-lock.json
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+*.sublime-project
+*.sublime-workspace
+.prettierignore
+
+# Build Output
+dist/
+build/
+bin/
+lib/
+*.o
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+database.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+junit.xml
+test-results/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Misc
+.cache/
+.venv/
+venv/
+ENV/
+env/
+
+# C++ Specific
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+*.o
+*.a
+*.so
+*.exe
+
+# Upload directories
+uploads/
+temp_uploads/
+
+# Sensitive files
+.ssh/
+*.pem
+*.key
+private_key*

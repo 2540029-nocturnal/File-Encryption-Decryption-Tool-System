@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CipherTool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="goHome()" title="Go to Dashboard" style="cursor: pointer;">
+                <i class="fas fa-lock logo-icon"></i>
+                <span>CipherTool</span>
+            </div>
+            <nav>
+                <button onclick="navigateTo('dashboard')" class="btn btn-secondary">Dashboard</button>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="max-width: 600px;">
+            <h1 style="color: #00ffff; margin-bottom: 2rem; font-size: 2rem;">
+                <i class="fas fa-user-circle"></i> User Profile
+            </h1>
+
+            
+            <div class="card">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-info-circle"></i> Account Information
+                </h2>
+
+                <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; color: #00d4ff; margin-right: 1.5rem;">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div>
+                        <p style="color: #00ffff; font-size: 1.2rem; font-weight: 600;" id="profileUsername">Loading...</p>
+                        <p style="color: #a8a8a8;" id="profileEmail">-</p>
+                        <p style="color: #a8a8a8; font-size: 0.9rem;" id="profileCreated">-</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #00d4ff; margin-bottom: 1rem;">Account Stats</h3>
+                    <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 5px;">
+                        <p style="color: #a8a8a8; margin: 0.5rem 0;">
+                            <strong>Member Since:</strong> <span id="memberSince">-</span>
+                        </p>
+                        <p style="color: #a8a8a8; margin: 0.5rem 0;">
+                            <strong>Last Login:</strong> <span id="lastLogin">-</span>
+                        </p>
+                        <p style="color: #a8a8a8; margin: 0.5rem 0;">
+                            <strong>Total Encryptions:</strong> <span id="totalEncryptions">0</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-lock"></i> Change Password
+                </h2>
+
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="oldPassword">Current Password</label>
+                        <input type="password" id="oldPassword" placeholder="Enter your current password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" placeholder="Confirm new password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Update Password
+                    </button>
+                </form>
+            </div>
+
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-shield-alt"></i> Security Settings
+                </h2>
+
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 5px; border-left: 3px solid #00d4ff;">
+                        <p style="color: #00ffff; font-weight: 600; margin-bottom: 0.5rem;">
+                            <i class="fas fa-check-circle"></i> Two-Factor Authentication
+                        </p>
+                        <p style="color: #a8a8a8; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Enable two-factor authentication for enhanced security
+                        </p>
+                        <button onclick="showAlert('2FA Coming Soon!', 'info')" class="btn btn-secondary">
+                            Enable 2FA
+                        </button>
+                    </div>
+
+                    <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 5px; border-left: 3px solid #00d4ff;">
+                        <p style="color: #00ffff; font-weight: 600; margin-bottom: 0.5rem;">
+                            <i class="fas fa-sign-out-alt"></i> Active Sessions
+                        </p>
+                        <p style="color: #a8a8a8; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            You have 1 active session. Logout from all other devices.
+                        </p>
+                        <button onclick="logoutAllDevices()" class="btn btn-danger">
+                            Logout All Devices
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="card" style="margin-top: 2rem; border-color: #ff006e; border-color: rgba(255, 0, 110, 0.5);">
+                <h2 style="color: #ff006e; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Danger Zone
+                </h2>
+
+                <button onclick="confirmDeleteAccount()" class="btn btn-danger" style="width: 100%;">
+                    <i class="fas fa-trash"></i> Delete Account
+                </button>
+                <p style="color: #a8a8a8; font-size: 0.85rem; margin-top: 0.5rem;">
+                    This action cannot be undone. All your data will be permanently deleted.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <div id="alertContainer"></div>
+    <script src="js/app.js"></script>
+    <script>
+        if (!isAuthenticated()) window.location.href = 'login.html';
+
+        async function loadProfile() {
+            const user = await getUserProfile();
+            if (user) {
+                document.getElementById('profileUsername').textContent = user.username || currentUser.username;
+                document.getElementById('profileEmail').textContent = user.email || currentUser.email;
+                document.getElementById('profileCreated').textContent = `Joined on ${formatDate(user.created_date)}`;
+                document.getElementById('memberSince').textContent = formatDate(user.created_date);
+                document.getElementById('lastLogin').textContent = user.last_login ? formatDate(user.last_login) : 'This session';
+            }
+        }
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmNewPassword) {
+                showAlert('Passwords do not match', 'error');
+                return;
+            }
+
+            const success = await changePassword(oldPassword, newPassword);
+            if (success) {
+                document.getElementById('changePasswordForm').reset();
+            }
+        });
+
+        function logoutAllDevices() {
+            if (confirm('Are you sure you want to logout from all devices?')) {
+                logout();
+            }
+        }
+
+        function confirmDeleteAccount() {
+            if (!confirm('Are you absolutely sure? This action cannot be undone!')) {
+                return;
+            }
+            const confirmed = prompt('Type DELETE to confirm account deletion');
+            if (confirmed === 'DELETE') {
+                deleteAccount();
+            } else {
+                showAlert('Account deletion canceled.', 'info');
+            }
+        }
+
+        loadProfile();
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - CipherTool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="goHome()" title="Go to Dashboard" style="cursor: pointer;">
+                <i class="fas fa-lock logo-icon"></i>
+                <span>CipherTool</span>
+            </div>
+            <nav>
+                <button onclick="navigateTo('dashboard')" class="btn btn-secondary">Dashboard</button>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 style="color: #00ffff; margin-bottom: 2rem; font-size: 2rem;">
+                <i class="fas fa-chart-bar"></i> Encryption Reports
+            </h1>
+
+            
+            <div class="card">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-filter"></i> Filter Options
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label for="filterAlgorithm">Algorithm</label>
+                        <select id="filterAlgorithm">
+                            <option value="">-- All Algorithms --</option>
+                            <option value="caesar">Caesar Cipher</option>
+                            <option value="xor">XOR Cipher</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="filterOperation">Operation</label>
+                        <select id="filterOperation">
+                            <option value="">-- All Operations --</option>
+                            <option value="encrypt">Encryption</option>
+                            <option value="decrypt">Decryption</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="filterDate">Date Range</label>
+                        <input type="date" id="filterDate">
+                    </div>
+
+                    <div style="display: flex; align-items: flex-end; gap: 1rem;">
+                        <button onclick="applyFilters()" class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-search"></i> Apply Filter
+                        </button>
+                        <button onclick="resetFilters()" class="btn btn-secondary" style="flex: 1;">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; color: #00d4ff; margin-bottom: 0.5rem;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div style="color: #a8a8a8; font-size: 0.9rem;">Total Encryptions</div>
+                    <div id="totalEncryptions" style="color: #00ffff; font-size: 2rem; font-weight: bold;">0</div>
+                </div>
+
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; color: #00d4ff; margin-bottom: 0.5rem;">
+                        <i class="fas fa-unlock"></i>
+                    </div>
+                    <div style="color: #a8a8a8; font-size: 0.9rem;">Total Decryptions</div>
+                    <div id="totalDecryptions" style="color: #00ffff; font-size: 2rem; font-weight: bold;">0</div>
+                </div>
+
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; color: #00d4ff; margin-bottom: 0.5rem;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div style="color: #a8a8a8; font-size: 0.9rem;">Success Rate</div>
+                    <div id="successRate" style="color: #00ffff; font-size: 2rem; font-weight: bold;">100%</div>
+                </div>
+
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; color: #00d4ff; margin-bottom: 0.5rem;">
+                        <i class="fas fa-file"></i>
+                    </div>
+                    <div style="color: #a8a8a8; font-size: 0.9rem;">Files Processed</div>
+                    <div id="filesProcessed" style="color: #00ffff; font-size: 2rem; font-weight: bold;">0</div>
+                </div>
+            </div>
+
+            
+            <div class="card">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-history"></i> Encryption History
+                </h2>
+
+                <div id="historyTable">
+                    <p style="color: #a8a8a8; text-align: center;">Loading history...</p>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button onclick="exportReportPDF()" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-file-pdf"></i> Export as PDF
+                    </button>
+                    <button onclick="exportReportCSV()" class="btn btn-secondary" style="flex: 1;">
+                        <i class="fas fa-file-csv"></i> Export as CSV
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-pie-chart"></i> Algorithm Usage
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div style="background: rgba(0, 212, 255, 0.1); padding: 1.5rem; border-radius: 5px; text-align: center; border-left: 3px solid #00d4ff;">
+                        <div style="color: #00ffff; font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;" id="caesarCount">0</div>
+                        <div style="color: #a8a8a8; font-size: 0.9rem;">Caesar Cipher</div>
+                    </div>
+
+                    <div style="background: rgba(0, 212, 255, 0.1); padding: 1.5rem; border-radius: 5px; text-align: center; border-left: 3px solid #00d4ff;">
+                        <div style="color: #00ffff; font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;" id="xorCount">0</div>
+                        <div style="color: #a8a8a8; font-size: 0.9rem;">XOR Cipher</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="alertContainer"></div>
+    <script src="js/app.js"></script>
+    <script>
+        if (!isAuthenticated()) window.location.href = 'login.html';
+
+        const sampleHistory = [
+            { date: new Date().toISOString(), algorithm: 'caesar', operation: 'encrypt', status: 'success', size: '2.5 MB' },
+            { date: new Date(Date.now() - 86400000).toISOString(), algorithm: 'xor', operation: 'decrypt', status: 'success', size: '1.2 MB' },
+            { date: new Date(Date.now() - 172800000).toISOString(), algorithm: 'caesar', operation: 'encrypt', status: 'success', size: '3.8 MB' },
+        ];
+
+        function loadReports() {
+            const history = sampleHistory;
+            
+            
+            const encryptions = history.filter(h => h.operation === 'encrypt').length;
+            const decryptions = history.filter(h => h.operation === 'decrypt').length;
+            const successful = history.filter(h => h.status === 'success').length;
+
+            document.getElementById('totalEncryptions').textContent = encryptions;
+            document.getElementById('totalDecryptions').textContent = decryptions;
+            document.getElementById('successRate').textContent = ((successful / history.length) * 100).toFixed(0) + '%';
+            document.getElementById('filesProcessed').textContent = history.length;
+
+            
+            const caesarCount = history.filter(h => h.algorithm === 'caesar').length;
+            const xorCount = history.filter(h => h.algorithm === 'xor').length;
+            document.getElementById('caesarCount').textContent = caesarCount;
+            document.getElementById('xorCount').textContent = xorCount;
+
+            
+            let html = '<table><thead><tr><th>Date & Time</th><th>Algorithm</th><th>Operation</th><th>File Size</th><th>Status</th></tr></thead><tbody>';
+            
+            history.forEach(item => {
+                const statusColor = item.status === 'success' ? 'var(--success)' : 'var(--danger)';
+                html += `
+                    <tr>
+                        <td>${formatDate(item.date)}</td>
+                        <td>${item.algorithm === 'caesar' ? '🔄 Caesar Cipher' : '⚙️ XOR Cipher'}</td>
+                        <td>${item.operation === 'encrypt' ? '🔒 Encryption' : '🔓 Decryption'}</td>
+                        <td>${item.size}</td>
+                        <td><span style="color: ${statusColor}; font-weight: 600;">● ${item.status.toUpperCase()}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('historyTable').innerHTML = html;
+        }
+
+        function applyFilters() {
+            showAlert('Filters applied', 'info');
+            loadReports();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterAlgorithm').value = '';
+            document.getElementById('filterOperation').value = '';
+            document.getElementById('filterDate').value = '';
+            loadReports();
+        }
+
+        function exportReportPDF() {
+            showAlert('PDF export feature coming soon', 'info');
+        }
+
+        function exportReportCSV() {
+            exportToCSV(sampleHistory, 'encryption_report.csv');
+        }
+
+        loadReports();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherTool - Secure File Encryption & Decryption</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            z-index: 1;
+            animation: slideIn 1s ease-out;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #00d4ff, #00ffff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #a8a8a8;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .shield-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            color: #00d4ff;
+            animation: float 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(26, 31, 58, 0.6) 0%, rgba(10, 14, 39, 0.6) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            border-color: #00ffff;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            color: #00ffff;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: #a8a8a8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        footer {
+            background: linear-gradient(90deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 31, 58, 0.95) 100%);
+            border-top: 2px solid #00d4ff;
+            padding: 2rem;
+            text-align: center;
+            color: #a8a8a8;
+        }
+
+        .animated-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 20% 50%, #00d4ff 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, #00ffff 0%, transparent 50%);
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="goHome()" title="Go to Dashboard" style="cursor:pointer;">
+                <i class="fas fa-lock logo-icon"></i>
+                <span>CipherTool</span>
+            </div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <button onclick="navigateTo('login')" class="btn btn-primary">Login</button>
+                <button onclick="navigateTo('register')" class="btn btn-secondary">Register</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        
+        <section class="hero">
+            <div class="animated-background"></div>
+            <div class="hero-content">
+                <i class="fas fa-lock hero-icon shield-icon"></i>
+                <h1 class="hero-title">🔐 File Encryption & Decryption</h1>
+                <p class="hero-subtitle">
+                    Advanced cybersecurity tool with Caesar Cipher and XOR encryption algorithms.
+                    Protect your files with military-grade encryption.
+                </p>
+                <div class="hero-buttons">
+                    <button onclick="navigateTo('register')" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Get Started
+                    </button>
+                    <button onclick="navigateTo('login')" class="btn btn-secondary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        
+        <section id="features" style="background: linear-gradient(135deg, rgba(26, 31, 58, 0.3) 0%, rgba(10, 14, 39, 0.3) 100%); padding: 4rem 0;">
+            <div class="container">
+                <h2 style="text-align: center; color: #00ffff; font-size: 2.5rem; margin-bottom: 3rem;">
+                    <i class="fas fa-star"></i> Key Features
+                </h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-sync-alt feature-icon"></i>
+                        <h3 class="feature-title">Caesar Cipher</h3>
+                        <p class="feature-desc">Classic encryption algorithm with configurable shift values for securing your data.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-code feature-icon"></i>
+                        <h3 class="feature-title">XOR Encryption</h3>
+                        <p class="feature-desc">Fast and reliable XOR-based encryption for quick file security operations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-key feature-icon"></i>
+                        <h3 class="feature-title">Key Management</h3>
+                        <p class="feature-desc">Generate, store, and manage encryption keys securely in your account.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line feature-icon"></i>
+                        <h3 class="feature-title">Activity Reports</h3>
+                        <p class="feature-desc">Track and analyze all encryption and decryption operations with detailed logs.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-user-shield feature-icon"></i>
+                        <h3 class="feature-title">User Profile</h3>
+                        <p class="feature-desc">Secure authentication with password protection and profile management.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-download feature-icon"></i>
+                        <h3 class="feature-title">Export Options</h3>
+                        <p class="feature-desc">Export encrypted files and reports in multiple formats with one click.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section id="about" style="padding: 4rem 2rem;">
+            <div class="container">
+                <h2 style="color: #00ffff; font-size: 2rem; margin-bottom: 1.5rem;">
+                    <i class="fas fa-info-circle"></i> About This Project
+                </h2>
+                <p style="color: #a8a8a8; line-height: 1.8; margin-bottom: 1rem;">
+                    <strong>File Encryption & Decryption Tool System</strong> is a professional cybersecurity application
+                    designed for secure file handling and data protection. Built with modern technologies and OOP principles,
+                    it provides enterprise-level security features.
+                </p>
+                <h3 style="color: #00d4ff; margin-top: 2rem; margin-bottom: 1rem;">Technology Stack:</h3>
+                <ul style="color: #a8a8a8; margin-left: 2rem; line-height: 2;">
+                    <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript (Vanilla)</li>
+                    <li><strong>Backend:</strong> C++ (Encryption library & CLI/server)</li>
+                    <li><strong>Encryption:</strong> C++ with Caesar & XOR Cipher Algorithms</li>
+                    <li><strong>Database:</strong> SQLite with secure schema</li>
+                    <li><strong>Authentication:</strong> JWT-based token system</li>
+                    <li><strong>Design:</strong> Cybersecurity dark theme with Neon Blue accents</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    
+    <footer>
+        <p>&copy; 2024 CipherTool. All rights reserved.</p>
+        <p style="margin-top: 1rem; font-size: 0.85rem;">
+            Department of Cyber Security, Air University Karachi Campus
+        </p>
+    </footer>
+
+    <div id="alertContainer"></div>
+    <script src="js/app.js"></script>
+</body>
+</html>

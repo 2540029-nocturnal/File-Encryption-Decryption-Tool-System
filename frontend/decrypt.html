@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decrypt - CipherTool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="goHome()" title="Go to Dashboard">
+                <i class="fas fa-lock logo-icon"></i>
+                <span>CipherTool</span>
+            </div>
+            <nav>
+                <button onclick="navigateTo('dashboard')" class="btn btn-secondary">Dashboard</button>
+                <button onclick="logout()" class="btn btn-secondary">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 style="color: #00ffff; margin-bottom: 2rem; font-size: 2rem;">
+                <i class="fas fa-unlock"></i> Decrypt Files
+            </h1>
+
+            <div class="card">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-file-upload"></i> Upload Encrypted File
+                </h2>
+
+                <form id="decryptForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label for="encryptedFile">Encrypted File</label>
+                        <input type="file" id="encryptedFile" required>
+                        <small style="color: #a8a8a8; margin-top: 0.5rem; display: block;">
+                            Select the encrypted file you want to decrypt
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="algorithm">Encryption Algorithm</label>
+                        <select id="algorithm" required>
+                            <option value="">-- Select Algorithm --</option>
+                            <option value="caesar">Caesar Cipher</option>
+                            <option value="xor">XOR Cipher</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="decryptionKey">Decryption Key</label>
+                        <input type="text" id="decryptionKey" placeholder="Enter your decryption key" required>
+                        <small style="color: #a8a8a8; margin-top: 0.5rem; display: block;">
+                            Use the same key that was used for encryption
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-unlock"></i> Decrypt File
+                    </button>
+                </form>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h2 style="color: #00ffff; margin-bottom: 1.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-file-download"></i> Decrypted Output
+                </h2>
+
+                <div id="decryptedOutput" style="background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 5px; padding: 1rem; font-family: 'Courier New', monospace; word-break: break-all; max-height: 300px; overflow-y: auto; color: #00d4ff; font-size: 0.9rem;">
+                    Decrypted content will appear here...
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button onclick="copyDecrypted()" class="btn btn-secondary" style="flex: 1;">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button onclick="downloadDecrypted()" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="alertContainer"></div>
+    <script src="js/app.js"></script>
+    <script>
+        if (!isAuthenticated()) window.location.href = 'login.html';
+
+        let decryptedDataBytes = null;
+        let sourceEncryptedFileName = '';
+
+        document.getElementById('decryptForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const file = document.getElementById('encryptedFile').files[0];
+            const algorithm = document.getElementById('algorithm').value;
+            const key = document.getElementById('decryptionKey').value;
+
+            if (!file || !algorithm || !key) {
+                showAlert('Please fill all fields', 'error');
+                return;
+            }
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const encryptedContent = event.target.result;
+                    sourceEncryptedFileName = file.name;
+                    let outputBytes = null;
+
+                    if (algorithm === 'xor') {
+                        const uint8Array = new Uint8Array(encryptedContent);
+                        outputBytes = decryptBytes(uint8Array, algorithm, key);
+                    } else {
+                        const encryptedText = new TextDecoder().decode(encryptedContent);
+                        outputBytes = decryptBytes(encryptedText, algorithm, key);
+                    }
+
+                    if (outputBytes) {
+                        decryptedDataBytes = outputBytes;
+                        const decoded = new TextDecoder('utf-8', { fatal: false }).decode(outputBytes);
+                        const invalidChars = [...decoded].filter(ch => ch === '\uFFFD' || (ch.charCodeAt(0) < 32 && !['\n','\r','\t'].includes(ch))).length;
+                        if (outputBytes.length === 0) {
+                            document.getElementById('decryptedOutput').textContent = 'Decryption produced no data.';
+                        } else if (invalidChars / Math.max(1, decoded.length) > 0.2) {
+                            document.getElementById('decryptedOutput').textContent = 'Binary file decrypted. Download it to open the result.';
+                        } else {
+                            document.getElementById('decryptedOutput').textContent = decoded.substring(0, 500) + (decoded.length > 500 ? '...' : '');
+                        }
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (error) {
+                showAlert('Decryption error: ' + error.message, 'error');
+            }
+        });
+
+        function copyDecrypted() {
+            if (decryptedDataBytes) {
+                const decoded = new TextDecoder('utf-8', { fatal: false }).decode(decryptedDataBytes);
+                copyToClipboard(decoded);
+            }
+        }
+
+        function downloadDecrypted() {
+            if (!decryptedDataBytes) {
+                showAlert('No decrypted data to download', 'error');
+                return;
+            }
+            const blob = new Blob([decryptedDataBytes], { type: 'application/octet-stream' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const filename = sourceEncryptedFileName.endsWith('.encrypted')
+                ? sourceEncryptedFileName.slice(0, -'.encrypted'.length)
+                : sourceEncryptedFileName + '.decrypted';
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showAlert('File downloaded successfully', 'success');
+        }
+    </script>
+</body>
+</html>
